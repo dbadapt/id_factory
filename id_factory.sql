@@ -7,7 +7,6 @@ CREATE TABLE `id_factory` (
   node_bits TINYINT NOT NULL,
   PRIMARY KEY (namespace, node)
 ) ENGINE=InnoDB;
-SET @id_factory_last_nzero=0;
 SET @id_factory_last_id=0;
 -- id_factory function
 delimiter //
@@ -25,26 +24,14 @@ BEGIN
   IF LENGTH(pnamespace) = 0 THEN
     SET pnamespace='default';
   END IF;
-  -- check and create our record the first time
-  IF NOT @id_factory_last_nzero <=> nzero THEN
-    SELECT COUNT(*) FROM `id_factory`
-    WHERE `namespace`=pnamespace
-    AND node=nzero
-    INTO last_id;
-    -- insert a record if we do not have one
-    IF last_id = 0 THEN
-      INSERT INTO `id_factory`
-        (id,namespace,node,node_bits)
-      VALUES
-        (0,pnamespace,nzero,2);
-    END IF;
-  END IF;
-  -- increment the id value
-  UPDATE `id_factory`
-  SET id=(id+1)
-  WHERE `namespace`=pnamespace
-  AND node=nzero;
-  -- select the current id
+  -- insert or update
+  INSERT INTO `id_factory`
+    (id,namespace,node,node_bits)
+  VALUES
+    (1,pnamespace,nzero,2)
+  ON DUPLICATE KEY UPDATE
+    id=(id+1);
+  -- select them back
   SELECT id,node_bits
   FROM `id_factory`
   WHERE `namespace`=pnamespace
@@ -53,7 +40,6 @@ BEGIN
   -- compute retval
   SET retval = last_id << nbits | nzero;
   -- record our node and last_id
-  SET @id_factory_last_nzero = nzero;
   SET @id_factory_last_id = retval;
   RETURN retval;
 END
