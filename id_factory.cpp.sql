@@ -24,45 +24,44 @@ BEGIN
   DECLARE last_id BIGINT UNSIGNED;    -- last_id assigned
   DECLARE nbits TINYINT UNSIGNED;     -- stored node bits
   DECLARE nzero TINYINT UNSIGNED;     -- zero based node
+  DECLARE bleh CHAR(255);
   SET retval = 0;
   SET nzero = @@auto_increment_offset - 1;
   -- use 'default' as namespace if none specified
   IF LENGTH(pnamespace) = 0 THEN
     SET pnamespace='default';
   END IF;
-  -- lock id_factory for this node only
-  IF get_lock(concat('_id_factory_lock',nzero),60) THEN
-    -- check and create our record the first time
-    IF NOT @id_factory_last_nzero <=> nzero THEN
-      SELECT COUNT(*) FROM TABLE_NAME 
-      WHERE `namespace`=pnamespace
-      AND node=nzero
-      INTO last_id;
-      -- insert a record if we do not have one
-      IF last_id = 0 THEN
-        INSERT INTO TABLE_NAME
-          (id,namespace,node,node_bits)
-        VALUES
-          (0,pnamespace,nzero,NODE_BITS); 
-      END IF;
-    END IF;
-    -- increment the id value 
-    UPDATE TABLE_NAME
-    SET id=id+1
-    WHERE `namespace`=pnamespace
-    AND node=nzero;
-    -- call stored procedure to set last_insert_id()
-    SELECT idfac.id << idfac.node_bits | nzero
-    FROM TABLE_NAME AS idfac
+  -- check and create our record the first time
+  IF NOT @id_factory_last_nzero <=> nzero THEN
+    SELECT COUNT(*) FROM TABLE_NAME 
     WHERE `namespace`=pnamespace
     AND node=nzero
-    INTO retval;
-    -- unlock            
-    SET lock_result=release_lock(concat('_id_factory_lock',nzero));
-    -- record zero based node for next call 
-    SET @id_factory_last_nzero = nzero;
-    SET @id_factory_last_id = retval;
+    INTO last_id;
+    -- insert a record if we do not have one
+    IF last_id = 0 THEN
+      INSERT INTO TABLE_NAME
+        (id,namespace,node,node_bits)
+      VALUES
+        (0,pnamespace,nzero,NODE_BITS); 
+    END IF;
   END IF;
+  -- select the current id
+  SELECT (id+1),node_bits 
+  FROM TABLE_NAME
+  WHERE `namespace`=pnamespace
+  AND node=nzero
+  INTO last_id,nbits
+  FOR UPDATE;
+  -- increment the id value 
+  UPDATE TABLE_NAME
+  SET id=last_id
+  WHERE `namespace`=pnamespace
+  AND node=nzero;
+  -- compute retval
+  SET retval = last_id << nbits | nzero;
+  -- record our node and last_id
+  SET @id_factory_last_nzero = nzero;
+  SET @id_factory_last_id = retval;
   RETURN retval;
 END
 //
