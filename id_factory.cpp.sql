@@ -5,11 +5,11 @@
 
 -- id_factory table
 CREATE TABLE TABLE_NAME (
-  id BIGINT UNSIGNED NOT NULL,
   namespace CHAR(255) NOT NULL,
   node TINYINT UNSIGNED NOT NULL,
+  id BIGINT UNSIGNED NOT NULL,
   node_bits TINYINT NOT NULL,
-  PRIMARY KEY (id, namespace, node)
+  PRIMARY KEY (namespace, node)
 ) ENGINE=InnoDB;
 
 SET @id_factory_last_nzero=0;
@@ -45,18 +45,17 @@ BEGIN
         (0,pnamespace,nzero,NODE_BITS); 
     END IF;
   END IF;
+  -- increment the id value 
+  UPDATE TABLE_NAME
+  SET id=(id+1)
+  WHERE `namespace`=pnamespace
+  AND node=nzero;
   -- select the current id
-  SELECT (id+1),node_bits 
+  SELECT id,node_bits 
   FROM TABLE_NAME
   WHERE `namespace`=pnamespace
   AND node=nzero
-  INTO last_id,nbits
-  FOR UPDATE;
-  -- increment the id value 
-  UPDATE TABLE_NAME
-  SET id=last_id
-  WHERE `namespace`=pnamespace
-  AND node=nzero;
+  INTO last_id,nbits;
   -- compute retval
   SET retval = last_id << nbits | nzero;
   -- record our node and last_id
