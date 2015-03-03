@@ -13,10 +13,11 @@ CREATE TABLE TABLE_NAME (
 ) ENGINE=InnoDB;
 
 SET @id_factory_last_nzero=0;
+SET @id_factory_last_id=0;
 
 -- id_factory function
 delimiter //
-CREATE FUNCTION id_factory_next(pnamespace CHAR(32)) RETURNS BIGINT(20) UNSIGNED
+CREATE FUNCTION id_factory_next(pnamespace CHAR(255)) RETURNS BIGINT(20) UNSIGNED
 BEGIN
   DECLARE retval BIGINT UNSIGNED;     -- return value
   DECLARE lock_result INT UNSIGNED;   -- get_lock result
@@ -45,24 +46,33 @@ BEGIN
           (0,pnamespace,nzero,NODE_BITS); 
       END IF;
     END IF;
-    -- select node bits from table
-    SELECT node_bits
-    FROM TABLE_NAME
-    WHERE `namespace`=pnamespace
-    AND node=nzero
-    INTO nbits;
     -- increment the id value 
     UPDATE TABLE_NAME
-    SET id=last_insert_id(id+1)
+    SET id=id+1
     WHERE `namespace`=pnamespace
     AND node=nzero;
+    -- call stored procedure to set last_insert_id()
+    SELECT idfac.id << idfac.node_bits | nzero
+    FROM TABLE_NAME AS idfac
+    WHERE `namespace`=pnamespace
+    AND node=nzero
+    INTO retval;
     -- unlock            
     SET lock_result=release_lock(concat('_id_factory_lock',nzero));
-    -- return id with node bits
-    SET retval = last_insert_id() << nbits | nzero;
-    SET @id_factory_last_nzero = retval;
+    -- record zero based node for next call 
+    SET @id_factory_last_nzero = nzero;
+    SET @id_factory_last_id = retval;
   END IF;
   RETURN retval;
 END
 //
 delimiter ;
+
+delimiter //
+CREATE FUNCTION id_factory_last() RETURNS BIGINT(20) UNSIGNED
+BEGIN
+  RETURN @id_factory_last_id;
+END
+//
+delimiter ;
+
