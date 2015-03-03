@@ -2,4 +2,4 @@
 
 A MySQL shared id_factory implemented as a stored function with Galera cluster support
 
-UNTESTED - working on tests now
+
