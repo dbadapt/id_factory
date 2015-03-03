@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MYSQLOPTS="-uroot test"
+MYSQLOPTS="-uroot -ppassword test"
 TABLE="test"
 NAMESPACE="test_space"
 COUNT=10000
