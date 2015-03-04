@@ -1,8 +1,8 @@
 #!/usr/bin/perl -w
 use strict;
 
-if ($#ARGV != 3) {
-  print "Usage: $0 {table} {namespace} {count} {trial}\n";
+if ($#ARGV < 3) {
+  print "Usage: $0 [table] [namespace] [count] [trial] {galera}\n";
   exit;
 }
 
@@ -10,6 +10,21 @@ my $table=$ARGV[0];
 my $namespace=$ARGV[1];
 my $count=$ARGV[2];
 my $trial=$ARGV[3];
+
+my $galera=0;
+for (my $a=4; $a<=$#ARGV; $a++) {
+  if ($ARGV[$a] =~ /galera/i) {
+    $galera=1;
+    last;
+  }
+}
+
+if ($galera > 0) {
+  print<<END_SETUP;
+set global wsrep_retry_autocommit=60;
+
+END_SETUP
+}
 
 print<<END_CREATE;
 CREATE TABLE IF NOT EXISTS $table (
