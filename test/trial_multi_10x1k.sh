@@ -3,8 +3,8 @@
 MYSQLOPTS="-uroot -ppassword -f -w test"
 TABLE="test"
 NAMESPACE="test_space"
-COUNT=4096
-THREADS=32
+COUNT=128
+THREADS=16
 
 HAS_GALERA=$(mysql ${MYSQLOPTS} -e "show variables like 'wsrep%commit'" 2>/dev/null | grep -c 'commit')
 if [ "$HAS_GALERA" == "1" ]; then
