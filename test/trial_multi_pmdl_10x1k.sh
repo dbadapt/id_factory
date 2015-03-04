@@ -3,7 +3,7 @@
 USER=root
 PASSWORD=password
 DATABASE=test
-HOST=localhost
+HOST=127.0.0.1
 TABLE="test"
 NAMESPACE="test_space"
 COUNT=128
