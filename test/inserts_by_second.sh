@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 # This script uses the R plotting language to plot the number of inserts every
 # minute from the test data
@@ -7,11 +7,11 @@ MYSQLOPTS="-uroot -ppassword test"
 
 # create time table with hour and minute of each insert
 cat << END_OF_TIME | mysql ${MYSQLOPTS} 2> /dev/null
-drop table if exists \`time\`; 
+drop table if exists \`time\`;
 
 create table if not exists \`time\` (
   id bigint primary key, 
-  timeinc char(5), 
+  timeinc bigint,
   key time_timeinc (timeinc,id)
 );
 
@@ -20,7 +20,7 @@ set @min_test_time=(select min(ts) from test);
 insert into \`time\` 
 select 
   id,
-  time_format(timediff(ts,@min_test_time), '%H:%i') as timeinc
+  time_to_sec(timediff(ts,@min_test_time)) as timeinc
 from test;
 END_OF_TIME
 
