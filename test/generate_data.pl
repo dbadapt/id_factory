@@ -1,6 +1,8 @@
 #!/usr/bin/perl -w
 use strict;
 
+# Data generator for id_factory_next() trials
+
 if ($#ARGV < 3) {
   print "Usage: $0 [table] [namespace] [count] [trial] {galera}\n";
   exit;

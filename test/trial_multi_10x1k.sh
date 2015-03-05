@@ -1,9 +1,14 @@
 #!/bin/bash
 
+# This trial uses the standard mysql client to test simultaneous threads
+# generating id's using the id_factory_next() function.  Running this test on
+# a wsrep cluster will probably result in some errors as the mysql client will
+# not automatically retry on deadlock and lock wait errors.
+
 MYSQLOPTS="-uroot -ppassword -f -w test"
 TABLE="test"
 NAMESPACE="test_space"
-COUNT=128
+COUNT=1024
 THREADS=16
 
 HAS_GALERA=$(mysql ${MYSQLOPTS} -e "show variables like 'wsrep%commit'" 2>/dev/null | grep -c 'commit')

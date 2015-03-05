@@ -1,13 +1,17 @@
 #!/bin/bash
 
+# This test is designed to be run simultaneously on multiple nodes of a wsrep
+# cluster.  It uses the dbpercona/pmdl data loader which will automatically
+# continue on Deadlock and Lock wait errors. 
+
 USER=root
 PASSWORD=password
 DATABASE=test
 HOST=127.0.0.1
 TABLE="test"
 NAMESPACE="test_space"
-COUNT=128
-THREADS=16
+COUNT=1024
+THREADS=24
 
 MYSQLOPTS="-u${USER} -p${PASSWORD} -h${HOST} -f -w ${DATABASE}"
 PMDLOPTS="DBI:mysql:database=${DATABASE};host=${HOST} ${USER} ${PASSWORD}"
