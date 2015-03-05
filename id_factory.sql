@@ -7,7 +7,6 @@ CREATE TABLE `id_factory` (
   node_bits TINYINT NOT NULL,
   PRIMARY KEY (namespace, node)
 ) ENGINE=InnoDB;
-SET @id_factory_last_id=0;
 -- id_factory function
 delimiter //
 CREATE FUNCTION id_factory_next(pnamespace CHAR(255)) RETURNS BIGINT(20) UNSIGNED
@@ -42,13 +41,6 @@ BEGIN
   -- record our node and last_id
   SET @id_factory_last_id = retval;
   RETURN retval;
-END
-//
-delimiter ;
-delimiter //
-CREATE FUNCTION id_factory_last() RETURNS BIGINT(20) UNSIGNED
-BEGIN
-  RETURN @id_factory_last_id;
 END
 //
 delimiter ;
