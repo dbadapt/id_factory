@@ -10,4 +10,4 @@ test_install: id_factory.sql
 	mysql $(MYSQLOPTS) < id_factory.sql 2> /dev/null
 
 test_basic: test_install
-	mysql $(MYSQLOPTS) -e "select id_factory_next(''); select id_factory_next(''); select id_factory_next(''); select id_factory_last()" 2> /dev/null
+	mysql $(MYSQLOPTS) -e "select id_factory_next(''); select id_factory_next(''); select id_factory_next('')" 2> /dev/null
