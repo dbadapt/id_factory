@@ -12,11 +12,9 @@ delimiter //
 CREATE FUNCTION id_factory_next(pnamespace CHAR(255)) RETURNS BIGINT(20) UNSIGNED
 BEGIN
   DECLARE retval BIGINT UNSIGNED; -- return value
-  DECLARE lock_result INT UNSIGNED; -- get_lock result
   DECLARE last_id BIGINT UNSIGNED; -- last_id assigned
   DECLARE nbits TINYINT UNSIGNED; -- stored node bits
   DECLARE nzero TINYINT UNSIGNED; -- zero based node
-  DECLARE bleh CHAR(255);
   SET retval = 0;
   SET nzero = @@auto_increment_offset - 1;
   -- use 'default' as namespace if none specified
