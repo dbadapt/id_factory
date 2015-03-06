@@ -163,7 +163,7 @@ The maximum number of nodes that can be configured is 255 which is a NODE_BITS
 value of 8.  If the NODE_BITS value is larger than 8 then an error will be
 returned by the id_factory_next() function:
 
-   id_factory NODE_BITS size too large (maximum 8)
+    id_factory NODE_BITS size too large (maximum 8)
 
 If more nodes are present in the cluster than configured by NODE_BITS the
 id_factory_next() function will return an error:
