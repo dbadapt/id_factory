@@ -198,7 +198,7 @@ connection.
 # Increasing the size of the cluster
 
 The cluster size can be increased at any time by increasing **NODE_BITS** in
-**id_factory.cpp.sql**, and ebuilding the **id_factory.sql** script.
+**id_factory.cpp.sql**, and rebuilding the **id_factory.sql** script.
 
 For example to increase the maximum node size from 4 to 8:
 
