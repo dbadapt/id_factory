@@ -16,7 +16,7 @@ in other databases.
 to be created.
 * In most multi-master cluster configurations, id_factory generation will
 provide better ID coverage (fewer un-used number gaps) then AUTO_INCREMENT
-* id_factory can be configured to handle unique ID's single server systems
+* id_factory can be configured to handle unique ID's on single server systems
 that can be scaled up to multi-node environments.
 
 # Dependencies
@@ -52,13 +52,17 @@ bit-size of the cluster.  A value of 0
 The id_factory.cpp.sql script can be configured for various environments by
 adjusting the #define statements at the top of this file.
 
-    #define TABLE_NAME
+```c
+#define TABLE_NAME 
+``` 
 
 TABLE_NAME defines the name of the table used to store the id factory
 information.  The default table name is id_factory.  This can be changed to
 another table name if needed.
 
-    #define NODE_BITS
+```c
+#define NODE_BITS 
+```
 
 NODE_BITS defines the maximum size of the cluster in which unique id's can be
 generated.  A value of 0 will generate id's that will only be unique in
@@ -132,6 +136,8 @@ of tables using namespaces.  A namespace is an character identifier that you
 assign to your id's.  They can be created dynamically at any time.    For
 example:
 
+```sql  
+
     SET @user_id=id_factory_next('users');
 
     INSERT INTO users VALUES (@user_id,'dbennett',...);
@@ -140,7 +146,9 @@ example:
     (@user_id,@id_factory_next('rights'),'ADMIN','RW',...);    
 
     INSERT INTO user_rights VALUES
-    (@user_id,@id_factory_next('rights'),'','RW',...);
+    (@user_id,@id_factory_next('rights'),'','RW',..); 
+    
+```
 
 In this example, two namespaces are used,  the 'user' namespace is used to
 assign a unique ID to a new user row.  The user_rights table references the er
