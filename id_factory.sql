@@ -11,11 +11,9 @@ CREATE TABLE `id_factory` (
 delimiter //
 CREATE FUNCTION id_factory_next(pnamespace CHAR(255)) RETURNS BIGINT(20) UNSIGNED
 BEGIN
-  DECLARE retval BIGINT UNSIGNED; -- return value
   DECLARE last_id BIGINT UNSIGNED; -- last_id assigned
   DECLARE nbits TINYINT UNSIGNED; -- stored node bits
   DECLARE nzero TINYINT UNSIGNED; -- zero based node
-  SET retval = 0;
   SET nzero = @@auto_increment_offset - 1;
   -- use 'default' as namespace if none specified
   IF LENGTH(pnamespace) = 0 THEN
@@ -34,11 +32,7 @@ BEGIN
   WHERE `namespace`=pnamespace
   AND node=nzero
   INTO last_id,nbits;
-  -- compute retval
-  SET retval = last_id << nbits | nzero;
-  -- record our node and last_id
-  SET @id_factory_last_id = retval;
-  RETURN retval;
+  RETURN last_id << nbits | nzero;
 END
 //
 delimiter ;
