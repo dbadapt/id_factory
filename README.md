@@ -84,7 +84,7 @@ if necessary.
 
 In a multi-master cluster environment, different nodes must be able to create
 unique key identifiers independent from one another.  Traditionally,  in
-a MySQL environment this is handled by two variables that are assigned to each
+a MySQL system this is handled by two variables that are assigned to each
 node.  In a Percona XtraDB Cluster or other MySQL multi-master cluster
 environment this is handled by assigning two global variables to each node.
 
@@ -125,15 +125,48 @@ guaranteed that the @@auto_increment_offset value must be unique for each node
 in the cluster, we use this value converted from base-1 to base-0 as our value
 for the LSB when creating our identifier.
 
+# Optimal node count
+
 id_factory will work fine with any number of cluster nodes.  The NODE_BITS
 value must be large enough to handle unique ids for all of the nodes.
 However, for optimal id assignment, the number of nodes in a cluster should be
 a power of 2.
-
-*Warning: Long sentence*  
 
 It should also be noted that running a quantity of cluster nodes that are
 a power of 2 also means that the garbd arbitrator should be used to avoid
 a potential split-brain problem where cluster quorum consensus cannot be
 achieved with an equal number of cluster nodes on either side of a broken
 connection. 
+
+# Increasing the size of the cluster
+
+The cluster size can be increased at any time by increasing NODE_BITS in
+id_factory.cpp.sql, rebuilding the 
+
+For example to increase the maximum node size from 4 to 8:
+
+1. Make sure you have a good backup of your database.
+
+2. Change the NODE_BITS value in id_factory.cpp.sql from 2 to 3
+
+3. Run 'make' to build id_factory.sql
+
+4. Load id_factory.sql into your database
+
+5. Increase the node_bits stored in the id_factory table:
+
+  UPDATE id_factory set node_bits = 3;
+
+# Error handling
+
+The maximum number of nodes that can be configured is 255 which is a NODE_BITS
+value of 8.  If the NODE_BITS value is larger than 8 then an error will be
+returned by the id_factory_next() function:
+
+   id_factory NODE_BITS size too large (maximum 8)
+
+If more nodes are present in the cluster than configured by NODE_BITS the
+id_factory_next() function will return an error:
+
+    auto_increment_offset too large for defined NODE_BITS in id_factory
+
