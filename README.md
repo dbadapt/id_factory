@@ -80,7 +80,7 @@ id_factory_next() function in the 'test' database.
 The MYSQLOPTS value in Makefile can be adjusted to install and test the script
 if necessary.
 
-# Explanation of @@auto_increment_increment and @@auto_increment_offset
+# Explanation of MySQL Multi-Master AUTO_INCREMENT 
 
 In a multi-master cluster environment, different nodes must be able to create
 unique key identifiers independent from one another.  Traditionally,  in
