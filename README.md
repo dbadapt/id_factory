@@ -36,11 +36,11 @@ that can be scaled up to multi-node environments.
 
 1. Load the id_factory.sql script into the your database
 
-    mysql -uroot -ppassword {database} < id_factory.sql
+      mysql -uroot -ppassword {database} < id_factory.sql
 
 2.  Assign unique identifiers using the id_factory_next() function.
 
-    INSERT INTO mytable VALUES (id_factory_next(''),'ABC Company',...);
+      INSERT INTO mytable VALUES (id_factory_next(''),'ABC Company',...);
 
 # Configure id_factory for your environment
 
