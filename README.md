@@ -80,7 +80,7 @@ id_factory_next() function in the 'test' database.
 The MYSQLOPTS value in Makefile can be adjusted to install and test the script
 if necessary.
 
-# Explanation of MySQL Multi-Master AUTO_INCREMENT 
+# MySQL Multi-Master AUTO_INCREMENT 
 
 In a multi-master cluster environment, different nodes must be able to create
 unique key identifiers independent from one another.  Traditionally,  in
@@ -130,7 +130,7 @@ value must be large enough to handle unique ids for all of the nodes.
 However, for optimal id assignment, the number of nodes in a cluster should be
 a power of 2.
 
-* Warning: Long sentence *  
+*Warning: Long sentence*  
 
 It should also be noted that running a quantity of cluster nodes that are
 a power of 2 also means that the garbd arbitrator should be used to avoid
