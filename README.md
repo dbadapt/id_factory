@@ -120,10 +120,10 @@ The id_factory maintains a separate id for each namespace and node
 combination.  This id contains two parts,  the most significant bits of the
 identifier represent an integer that is incremented by 1 each time an id is
 generated on a node for a given namespace.  The least significant bits
-represent the node on which the cluster is created.  Since it is guaranteed
-that the @@auto_increment_offset value must be unique for each node in the
-cluster, we use this value converted from base-1 to base-0 as our value for
-the LSB when creating our identifier.
+represent the cluster ode on which the identifier is created.  Since it is
+guaranteed that the @@auto_increment_offset value must be unique for each node
+in the cluster, we use this value converted from base-1 to base-0 as our value
+for the LSB when creating our identifier.
 
 id_factory will work fine with any number of cluster nodes.  The NODE_BITS
 value must be large enough to handle unique ids for all of the nodes.
