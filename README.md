@@ -34,25 +34,25 @@ that can be scaled up to multi-node environments.
 
 # Quick Start
 
-1. Load the *id_factory.sql* script into the your database
+1. Load the **id_factory.sql** script into the your database
 
       mysql -uroot -ppassword {database} < id_factory.sql
 
-2.  Assign unique identifiers using the *id_factory_next()* function.
+2.  Assign unique identifiers using the **id_factory_next()** function.
 
       INSERT INTO mytable VALUES (id_factory_next(''),'ABC Company',...);
 
 # Configure id_factory for your environment
 
-The default *id_factory.sql* is configured for a maximum 4 node (2-bit)
-  cluster.  This can be verified by examining the *INSERT* instruction in the
-  *id_factory_next()* stored function.  The last value inserted (*node_bits*)
+The default **id_factory.sql** is configured for a maximum 4 node (2-bit)
+  cluster.  This can be verified by examining the **INSERT** instruction in the
+  **id_factory_next()** stored function.  The last value inserted (**node_bits**)
   is the bit-size of the cluster.  A value of 0 means no node bits are
   defined, in this case id_factory_next() will only support a single server
   environment.
 
-The *id_factory.cpp.sql* script can be configured for various environments by
-adjusting the *#define* statements at the top of this file.
+The **id_factory.cpp.sql** script can be configured for various environments by
+adjusting the **#define** statements at the top of this file.
 
 ```c
 #define TABLE_NAME 
@@ -66,24 +66,24 @@ another table name if needed.
 #define NODE_BITS 
 ```
 
-*NODE_BITS* defines the maximum size of the cluster in which unique id's can
+**NODE_BITS** defines the maximum size of the cluster in which unique id's can
 be generated.  A value of 0 will generate id's that will only be unique in
 a single server environment.  A value of 1 will support a maximum of 2 nodes.
 A value of 2 will support 4 nodes,  3=8, 4=16 and so on.
 
-After these values are set the new *id_factory.sql* script can be re-built by
+After these values are set the new **id_factory.sql** script can be re-built by
 using the command:
 
     make
 
-The *Makefile* contains rules for installing and running a basic test of the
-*id_factory_next()* function in the 'test' database.
+The **Makefile** contains rules for installing and running a basic test of the
+**id_factory_next()** function in the 'test' database.
 
     make test_install
 
     make test_basic
 
-The *MYSQLOPTS* value in Makefile can be adjusted to install and test the
+The **MYSQLOPTS** value in Makefile can be adjusted to install and test the
 script if necessary.
 
 # MySQL Multi-Master AUTO_INCREMENT 
@@ -94,19 +94,19 @@ a MySQL system this is handled by two variables that are assigned to each
 node.  In a Percona XtraDB Cluster or other MySQL multi-master cluster
 environment this is handled by assigning two global variables to each node.
 
-1. *@@auto_increment_offset* is the starting offset of the next identifier to
+1. **@@auto_increment_offset** is the starting offset of the next identifier to
    be assigned to a table row  In order for identifier's to be unique in
    a multi-master environment, this number must be different for each node in
    the cluster.  
    
-2. *@@auto_increment_increment* defines the number of integers left between
+2. **@@auto_increment_increment** defines the number of integers left between
    consecutive identifier generation on a node.  This number must be equal to
    or greater than the number of nodes that are active in the cluster at the
    time the id is created.
 
 When using Percona XtraDB Cluster, these values are dynamically assigned as
 the cluster grows to insure that there will never be any conflict in the
-numeric identifiers assigned to *AUTO_INCREMENT* columns within a table.
+numeric identifiers assigned to **AUTO_INCREMENT** columns within a table.
 
 While this method of unique id generation works well and has proven to be
 reliable, it has a few disadvantages:
@@ -114,27 +114,27 @@ reliable, it has a few disadvantages:
 * In a cluster environment, the increment and offset computation leave
 a larger number of gaps is the series allowing fewer unique id's to be used by
 table rows.
-* An *AUTO_INCREMENT* series is bound to a table column making it difficult
+* An **AUTO_INCREMENT** series is bound to a table column making it difficult
 for the identifier series to be used across multiple tables.
 * Static SQL scripts that create parent-child 'priming' records using
-*AUTO_INCREMENT* can be harder to write and read than scripts using discretely
+**AUTO_INCREMENT** can be harder to write and read than scripts using discretely
 generated ids.
 
 # How id_factory works
 
-The id_factory maintains a separate id for each *namespace* and node
+The id_factory maintains a separate id for each **namespace** and node
 combination.  This id contains two parts,  the most significant bits of the
 identifier represent an integer that is incremented by 1 each time an id is
-generated on a node for a given *namespace*.  The least significant bits
+generated on a node for a given **namespace**.  The least significant bits
 represent the cluster node on which the identifier is created.  Since it is
-guaranteed that the *@@auto_increment_offset* value will be unique for each
+guaranteed that the **@@auto_increment_offset** value will be unique for each
 node in the cluster, we use this value converted from base-1 to base-0 as our
 value for the LSB when creating our identifier.
 
 # Namespaces
 
 Different identifiers can be generated for different tables or different sets
-of tables using *namespaces*.  A namespace is a character identifier that can
+of tables using **namespaces**.  A namespace is a character identifier that can
 be assigned to an identifier series.  They can be created dynamically at any
 time.
 
@@ -172,7 +172,7 @@ the sign bit was flipped.
 
 # Similarity to sequences
 
-Identifiers created by *id_factory_next('')* share some similarity with the
+Identifiers created by **id_factory_next('')** share some similarity with the
 'sequence' feature found in other databases.  Like id_factory,  sequences
 provide unique identifiers that are not tied to the creation of a table row.
 However,  sequences provide other features such as definable increments,
@@ -197,8 +197,8 @@ connection.
 
 # Increasing the size of the cluster
 
-The cluster size can be increased at any time by increasing *NODE_BITS* in
-*id_factory.cpp.sql*, and ebuilding the *id_factory.sql* script.
+The cluster size can be increased at any time by increasing **NODE_BITS** in
+**id_factory.cpp.sql**, and ebuilding the **id_factory.sql** script.
 
 For example to increase the maximum node size from 4 to 8:
 
