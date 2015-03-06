@@ -125,6 +125,53 @@ guaranteed that the @@auto_increment_offset value must be unique for each node
 in the cluster, we use this value converted from base-1 to base-0 as our value
 for the LSB when creating our identifier.
 
+# Namespaces
+
+Different identifiers can be generated for different tables or different sets
+of tables using namespaces.  A namespace is an character identifier that you
+assign to your id's.  They can be created dynamically at any time.    For
+example:
+
+    SET @user_id=id_factory_next('users');
+
+    INSERT INTO users VALUES (@user_id,'dbennett',...);
+
+    INSERT INTO user_rights VALUES
+    (@user_id,@id_factory_next('rights'),'ADMIN','RW',...);    
+
+    INSERT INTO user_rights VALUES
+    (@user_id,@id_factory_next('rights'),'','RW',...);
+
+In this example, two namespaces are used,  the 'user' namespace is used to
+assign a unique ID to a new user row.  The user_rights table references the er
+id assigned and assigns new user_rights identifiers from a different namespace
+('rights').    
+
+If an empty namespace is specified, then the 'default' namespace is
+automatically selected.  This namespace can be used globally in an application
+to assure that all identifiers throughout the application are completely
+unique.  
+
+For many applications, a single namespace will be enough to handle all the
+identifiers within a system.  For example, When using BIGINT UNSIGNED
+identifiers and NODE_BITS set to 3 (8 cluster nodes) a single namespace will
+provide 2^61 or over 2.3 quintillion identifiers.  If you are using an
+application language that doesn't support unsigned 64-bit values 
+(such as Java) this would reduced to approximately 1.15 quintillion before the
+sign bit was flipped.
+
+# Similarity to sequences
+
+Identifiers created by id_factory_next('') share some similarity with the
+'sequence' feature found in other databases.  Like id_factory,  sequences
+provide unique identifiers that are not tied to the creation of a table row.
+However,  sequences provide other features such as definable increments, min
+and max values that id_factory() does not provide at this time.  
+
+It is also important to mention that in a cluster environment, the identifiers
+are not guaranteed to sequentially increase over time.  This is due to the
+nature of the generation of identifiers being independent on each node.
+
 # Optimal node count
 
 id_factory will work fine with any number of cluster nodes.  The NODE_BITS
