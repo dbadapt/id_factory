@@ -21,7 +21,7 @@ BEGIN
   DECLARE nzero TINYINT UNSIGNED;     -- zero based node
   DECLARE nmask TINYINT UNSIGNED;     -- node mask for testing
   DECLARE nloop TINYINT UNSIGNED;     -- loop increment
-  -- make sure NODE_BITS is not to large
+  -- make sure NODE_BITS is not too large
   IF NODE_BITS > 8 THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'id_factory NODE_BITS size too large (maximum 8)';
   END IF;
